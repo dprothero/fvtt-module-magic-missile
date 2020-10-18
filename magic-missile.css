@@ -1,0 +1,7 @@
+#chat-log .magic-missile {
+  font-weight: bold;
+  text-align: center;
+  border: red 1px solid;
+  margin: 3px 0 6px 0;
+  padding: 3px;
+}
