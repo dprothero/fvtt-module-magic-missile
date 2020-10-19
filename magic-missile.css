@@ -1,7 +1,15 @@
-#chat-log .magic-missile {
+#chat-log .magic-missile-heading {
   font-weight: bold;
   text-align: center;
+  text-transform: uppercase;
   border: red 1px solid;
   margin: 3px 0 6px 0;
   padding: 3px;
+}
+
+#chat-log .magic-missile-damage {
+  text-align: center;
+  font-style: italic;
+  font-size: 12px;
+  margin: 6px 0 0 0;
 }
