@@ -2,8 +2,8 @@
 This module adds a chat command /magicmissile (or /mm for short) to allow you to cast the
 5e spell Magic Missile at a desired level. The default level is 1.
 Chatcommands:
-/magicmissile [level]
-/mm [level]
+/magicmissile [level] [target_1_missiles, ..., target_n_missiles]
+/mm [level] [target_1_missiles, ..., target_n_missiles]
 */
 
 function ordinal_suffix_of(i) {
@@ -48,26 +48,51 @@ class MagicMissile {
 
       // parse the level from chat message
       const messageParts = content.split(' ');
-      if (messageParts.length > 1) {
-        let parsedLevel = parseInt(messageParts[1]);
+      messageParts.shift(); // remove the /mm
+      if (messageParts.length > 0) {
+        const parsedLevel = parseInt(messageParts.shift());
         if (parsedLevel >= 1 && parsedLevel <= 9) {
           level = parsedLevel;
         }
       }
 
-      // calculate the damage roll
-      const numMissiles = 2 + level;
-      const roll = new Roll(`${numMissiles}d4 + ${numMissiles}`);
-      roll.roll();
+      // parse splits
+      let missilesLeft = 2 + level;
+      const missileSplits = [];
+      while (messageParts.length > 0) {
+        const parsedMissiles = parseInt(messageParts.shift());
+        if (parsedMissiles > 0 && parsedMissiles <= missilesLeft) {
+          missileSplits.push(parsedMissiles);
+          missilesLeft = missilesLeft - parsedMissiles;
+        }
+      }
+      if(missilesLeft > 0) {
+        missileSplits.push(missilesLeft);
+      }
 
-      // produce new chat message
-      roll.render().then(diceHtml => {
+      // calculate the damage roll(s)
+      const rolls = [];
+      missileSplits.forEach(numMissiles => {
+        const roll = new Roll(`${numMissiles}d4 + ${numMissiles}`);
+        roll.roll();
+        rolls.push(roll.render());
+      });
+
+      // render dice roll(s)
+      Promise.all(rolls).then(diceHtmlValues => {
         // create spell description
         const levelStr = ordinal_suffix_of(level) + ' Level';
         let spellDescription;
         if (this.spell) {
           const sp = this.spell;
           const spd = this.spell.data.data;
+
+          // concatenate dice rolls
+          const dicePrefix = '<div class="card-buttons">';
+          const diceSuffix = `<div class="magic-missile-damage">${spd.damage.parts[0][1]} damage</div></div>`;
+          const diceHtml = dicePrefix + diceHtmlValues.join(diceSuffix + dicePrefix) + diceSuffix;
+
+          // render full spell description
           spellDescription = `
             <div class="dnd5e chat-card item-card" data-item-id="${sp.id}" data-spell-level="${level}">
               <header class="card-header flexrow">
@@ -77,9 +102,7 @@ class MagicMissile {
           
               <div class="card-content">${spd.description.value}</div>
           
-              <div class="card-buttons">${diceHtml}
-                <div class="magic-missile-damage">${spd.damage.parts[0][1]} damage</div>
-              </div>
+              ${diceHtml}
           
               <footer class="card-footer">
                 <span>${levelStr}</span>
@@ -91,15 +114,16 @@ class MagicMissile {
               </footer>
             </div>`
         } else {
+          // concatenate dice rolls
+          const diceSuffix = '<div class="magic-missile-damage">force damage</div>';
+          const diceHtml = diceHtmlValues.join(diceSuffix) + diceSuffix;
           spellDescription = `<div class="magic-missile-heading">Casting Magic Missile at ${levelStr}</div>` + 
-            diceHtml + '<div class="magic-missile-damage">force damage</div>';
+            diceHtml;
         }
 
         ChatMessage.create({
           content: `<div>${spellDescription}</div>`,
-          type: CHAT_MESSAGE_TYPES.ROLL,
-          speaker: data.speaker,
-          roll
+          speaker: data.speaker
         }, {});
       });
 
