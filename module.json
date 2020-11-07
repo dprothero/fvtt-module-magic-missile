@@ -2,7 +2,7 @@
   "name": "fvtt-module-magic-missile",
   "title": "Magic Missile",
   "description": "Easily cast the 5e Magic Missile spell from chat.",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "author": [
     "DPro"
   ],
@@ -17,7 +17,7 @@
   ],
   "url": "https://github.com/dprothero/fvtt-module-magic-missile",
   "manifest": "https://raw.githubusercontent.com/dprothero/fvtt-module-magic-missile/master/module.json",
-  "download": "https://github.com/dprothero/fvtt-module-magic-missile/archive/v0.4.0.zip",
+  "download": "https://github.com/dprothero/fvtt-module-magic-missile/archive/v0.4.1.zip",
   "minimumCoreVersion": "0.6.0",
-  "compatibleCoreVersion": "0.6.6"
+  "compatibleCoreVersion": "0.7.6"
 }

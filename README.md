@@ -43,3 +43,4 @@ You can actually leave off the last 2 since we can just send however many missil
 - v0.2.0: Initial release.
 - v0.3.0: Added image and full description of the spell, pulling from the 5e spell compendium.
 - v0.4.0: Added ability to split missiles to multiple targets.
+- v0.4.1: Tested with Foundry VTT 0.7.6.
